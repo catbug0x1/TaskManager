@@ -7,7 +7,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: github.repository != 'YOUR_USER/task-manager'
+    if: false  # Disabled until EC2 credentials are configured
     steps:
       - uses: actions/checkout@v4
 
