@@ -1,0 +1,11 @@
+.git
+.gitignore
+.env
+.env.example
+node_modules
+__pycache__
+*.pyc
+*.pyo
+.pytest_cache
+README.md
+setup.sh
