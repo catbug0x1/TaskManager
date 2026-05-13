@@ -3,21 +3,33 @@ name: Deploy to EC2
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
+          script_stop: true
           script: |
+            set -e
+            if ! command -v docker >/dev/null 2>&1; then
+              sudo apt-get update
+              sudo apt-get install -y docker.io docker-compose-v2 git
+              sudo systemctl enable --now docker
+            fi
+
+            if [ ! -d ~/task-manager/.git ]; then
+              git clone https://github.com/catbug0x1/TaskManager.git ~/task-manager
+            fi
+
             cd ~/task-manager
-            git pull origin main
-            docker compose up -d --build
-            docker image prune -f
+            git fetch origin main
+            git reset --hard origin/main
+            sudo docker compose up -d --build --remove-orphans
+            sudo docker image prune -f
